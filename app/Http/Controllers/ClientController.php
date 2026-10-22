@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Services\FirebirdClientApiService;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | LISTADO DE CLIENTES
+    |--------------------------------------------------------------------------
+    */
+
     public function index(
-        \Illuminate\Http\Request $request,
-        \App\Services\FirebirdClientApiService $firebird
+        Request $request,
+        FirebirdClientApiService $firebird
     ) {
         $search = trim(
             (string) $request->query('buscar', '')
@@ -25,76 +32,157 @@ class ClientController extends Controller
         try {
 
             if ($search !== '') {
+
                 $response = $firebird->search(
                     term: $search,
                     page: $page,
                     limit: $limit
                 );
+
             } else {
+
                 $response = $firebird->list(
                     page: $page,
                     limit: $limit
                 );
             }
 
-            $clients = $response['data'] ?? [];
 
-            $pagination = $response['pagination'] ?? [
-                'page' => $page,
-                'limit' => $limit,
-                'total' => 0,
-                'totalPages' => 0,
-                'hasNextPage' => false,
-                'hasPreviousPage' => false,
-            ];
+            $clients =
+                $response['data']
+                ?? [];
 
-            return view('clients.index', compact(
-                'clients',
-                'pagination',
-                'search'
-            ));
 
-        } catch (\Throwable $e) {
-
-            report($e);
-
-            return view('clients.index', [
-                'clients' => [],
-                'pagination' => [
-                    'page' => 1,
+            $pagination =
+                $response['pagination']
+                ?? [
+                    'page' => $page,
                     'limit' => $limit,
                     'total' => 0,
                     'totalPages' => 0,
                     'hasNextPage' => false,
                     'hasPreviousPage' => false,
-                ],
-                'search' => $search,
-            ])->withErrors([
-                        'clientes' => 'No fue posible consultar los clientes de Firebird.'
+                ];
+
+
+            return view(
+                'clients.index',
+                compact(
+                    'clients',
+                    'pagination',
+                    'search'
+                )
+            );
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            return view(
+                'clients.index',
+                [
+                    'clients' => [],
+
+                    'pagination' => [
+                        'page' => 1,
+                        'limit' => $limit,
+                        'total' => 0,
+                        'totalPages' => 0,
+                        'hasNextPage' => false,
+                        'hasPreviousPage' => false,
+                    ],
+
+                    'search' => $search,
+                ]
+            )->withErrors([
+                        'clientes' =>
+                            'No fue posible consultar los clientes de Firebird.',
                     ]);
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | DETALLE DEL CLIENTE
+    |--------------------------------------------------------------------------
+    */
+
     public function show(
+        Request $request,
         string $codigo,
-        \App\Services\FirebirdClientApiService $firebird
+        FirebirdClientApiService $firebird
     ) {
+        /*
+         * La base principal sigue siendo el origen por defecto
+         * para mantener compatibilidad con enlaces anteriores.
+         */
+        $source = strtolower(
+            trim(
+                (string) $request->query(
+                    'source',
+                    'main'
+                )
+            )
+        );
+
+
+        /*
+         * No permitir cualquier valor como origen.
+         */
+        if (
+            !in_array(
+                $source,
+                ['main', 'oric'],
+                true
+            )
+        ) {
+            abort(
+                400,
+                'Origen de cliente inválido.'
+            );
+        }
+
+
         try {
 
-            $response = $firebird->find($codigo);
-
-            $client = $response['data'] ?? null;
-
-            abort_if(
-                !$client,
-                404,
-                'Cliente no encontrado.'
+            /*
+             * IMPORTANTE:
+             *
+             * FirebirdClientApiService::find()
+             * YA devuelve directamente los datos
+             * del cliente.
+             */
+            $client = $firebird->find(
+                $codigo,
+                $source
             );
+
+
+            if (!$client) {
+                abort(
+                    404,
+                    'Cliente no encontrado.'
+                );
+            }
+
 
             return view(
                 'clients.show',
                 compact('client')
             );
+
+        } catch (
+            \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e
+        ) {
+
+            /*
+             * Si nosotros lanzamos 404/400,
+             * Laravel debe conservar ese código.
+             *
+             * No convertirlo en 503.
+             */
+            throw $e;
 
         } catch (\Throwable $e) {
 
@@ -107,30 +195,70 @@ class ClientController extends Controller
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | BÚSQUEDA LOCAL
+    |--------------------------------------------------------------------------
+    |
+    | Este método consulta la caché MySQL local.
+    | El buscador principal remoto utiliza FirebirdClientController.
+    |
+    */
+
     public function search(Request $request)
     {
-        $term = trim($request->get('q', ''));
+        $term = trim(
+            $request->get('q', '')
+        );
+
 
         if (mb_strlen($term) < 2) {
             return response()->json([]);
         }
 
+
         $clients = Client::query()
-            ->where(function ($query) use ($term) {
-                $query
-                    ->where('codigo', 'like', "%{$term}%")
-                    ->orWhere('nombre_completo', 'like', "%{$term}%")
-                    ->orWhere('rfc', 'like', "%{$term}%");
-            })
+
+            ->where(
+                function ($query) use ($term) {
+
+                    $query
+                        ->where(
+                            'codigo',
+                            'like',
+                            "%{$term}%"
+                        )
+
+                        ->orWhere(
+                            'nombre_completo',
+                            'like',
+                            "%{$term}%"
+                        )
+
+                        ->orWhere(
+                            'rfc',
+                            'like',
+                            "%{$term}%"
+                        );
+                }
+            )
+
             ->orderBy('nombre_completo')
+
             ->limit(10)
+
             ->get([
                 'id',
                 'codigo',
+                'source',
                 'nombre_completo',
                 'rfc',
             ]);
 
-        return response()->json($clients);
+
+        return response()->json(
+            $clients
+        );
     }
 }

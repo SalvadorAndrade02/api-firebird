@@ -8,6 +8,7 @@ class Client extends Model
 {
     protected $fillable = [
         'codigo',
+        'source',
         'tipo_persona',
 
         'nombre',
@@ -26,6 +27,7 @@ class Client extends Model
         'municipio',
         'estado',
         'pais',
+        
 
         'telefono',
         'movil',

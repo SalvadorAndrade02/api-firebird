@@ -196,13 +196,28 @@
         </div>
 
         <p>
-            <strong>INMOBILIARIA ESTRUCTURAL S.A. DE C.V.</strong>,
+            <strong>
+                {{ $company['nombre'] ?? '—' }}
+            </strong>,
             (en su subsecuente, <strong>“LA AGENCIA”</strong> y/o
             <strong>“LA EMPRESA”</strong> y/o
             <strong>“EL DISTRIBUIDOR”</strong>) cuyo domicilio fiscal es el ubicado
-            en <strong>AV. LÁZARO CÁRDENAS, NÚMERO 2938, COLONIA MIRADOR
-                RESIDENCIAL, MUNICIPIO DE MONTERREY, ESTADO DE NUEVO LEÓN
-                C.P. 64910.</strong>
+            en <strong>
+                {{ strtoupper($company['direccion']['calle'] ?? '') }}
+
+                @if (!empty($company['direccion']['numero']))
+                    #{{ strtoupper($company['direccion']['numero']) }}
+                @endif
+                ,
+                COLONIA
+                {{ strtoupper($company['direccion']['colonia'] ?? '') }},
+                MUNICIPIO DE
+                {{ strtoupper($company['direccion']['municipio'] ?? '') }},
+                ESTADO DE
+                {{ strtoupper($company['direccion']['estado'] ?? '') }},
+                C.P.
+                {{ $company['direccion']['codigoPostal'] ?? '' }}.
+            </strong>
         </p>
 
         <div class="privacy-section-title">
@@ -605,13 +620,34 @@
         <ul>
             <li>
                 <strong>Dirección de correo electrónico:</strong>
-                legal@rise.mx
+                {{ $company['email'] ?? 'legal@rise.mx' }}
             </li>
 
             <li>
                 <strong>Dirección de envíos:</strong>
-                Avenida Lázaro Cárdenas #2938 de la colonia Mirador en Monterrey,
-                Nuevo León con C.P. 64910.
+
+                {{ $company['direccion']['calle'] ?? '' }}
+
+                @if (!empty($company['direccion']['numero']))
+                    #{{ $company['direccion']['numero'] }}
+                @endif
+
+                @if (!empty($company['direccion']['colonia']))
+                    de la colonia {{ $company['direccion']['colonia'] }}
+                @endif
+
+                @if (!empty($company['direccion']['municipio']))
+                    en {{ $company['direccion']['municipio'] }}
+                @endif
+
+                @if (!empty($company['direccion']['estado']))
+                    , {{ $company['direccion']['estado'] }}
+                @endif
+
+                @if (!empty($company['direccion']['codigoPostal']))
+                    con C.P. {{ $company['direccion']['codigoPostal'] }}
+                @endif
+                .
             </li>
         </ul>
 
@@ -638,62 +674,91 @@
             <table class="signatures-table">
                 <tr>
 
-                    {{-- FIRMA DIGITAL --}}
-                    <td class="signature-column">
+                    @if(($notice->signature_type ?? null) === 'DIGITAL')
 
-                        <div class="signature-area">
+                        {{-- FIRMA DIGITAL --}}
+                        <td class="signature-column">
 
-                            @if (!empty($digitalSignature))
+                            <div class="signature-area">
 
-                                <img src="{{ $digitalSignature }}" class="signature-image" alt="Firma digital del titular">
+                                @if (!empty($digitalSignature))
 
-                            @else
+                                    <img src="{{ $digitalSignature }}" class="signature-image" alt="Firma digital del titular">
 
-                                <div class="signature-empty-space"></div>
+                                @else
+
+                                    <div class="signature-empty-space"></div>
+
+                                @endif
+
+                            </div>
+
+                            <div class="signature-border"></div>
+
+                            <div class="signature-label">
+                                FIRMA DIGITAL DEL TITULAR
+                            </div>
+
+                            @if ($clientName)
+
+                                <div class="signature-name">
+                                    {{ $clientName }}
+                                </div>
 
                             @endif
 
-                        </div>
+                        </td>
 
-                        <div class="signature-border"></div>
 
-                        <div class="signature-label">
-                            FIRMA DIGITAL DEL TITULAR
-                        </div>
+                        {{-- FIRMA FÍSICA --}}
+                        <td class="signature-column">
 
-                        @if ($clientName)
-
-                            <div class="signature-name">
-                                {{ $clientName }}
+                            <div class="signature-area">
+                                <div class="signature-empty-space"></div>
                             </div>
 
-                        @endif
+                            <div class="signature-border"></div>
 
-                    </td>
-
-
-                    {{-- FIRMA FÍSICA --}}
-                    <td class="signature-column">
-
-                        <div class="signature-area">
-                            <div class="signature-empty-space"></div>
-                        </div>
-
-                        <div class="signature-border"></div>
-
-                        <div class="signature-label">
-                            FIRMA AUTÓGRAFA DEL TITULAR
-                        </div>
-
-                        @if ($clientName)
-
-                            <div class="signature-name">
-                                {{ $clientName }}
+                            <div class="signature-label">
+                                FIRMA AUTÓGRAFA DEL TITULAR
                             </div>
 
-                        @endif
+                            @if ($clientName)
 
-                    </td>
+                                <div class="signature-name">
+                                    {{ $clientName }}
+                                </div>
+
+                            @endif
+
+                        </td>
+
+                    @else
+
+                        {{-- SOLO FIRMA FÍSICA --}}
+                        <td class="signature-column" colspan="2">
+
+                            <div class="signature-area">
+                                <div class="signature-empty-space"></div>
+                            </div>
+
+                            <div class="signature-border"></div>
+
+                            <div class="signature-label">
+                                FIRMA AUTÓGRAFA DEL TITULAR
+                            </div>
+
+                            @if ($clientName)
+
+                                <div class="signature-name">
+                                    {{ $clientName }}
+                                </div>
+
+                            @endif
+
+                        </td>
+
+                    @endif
 
                 </tr>
             </table>

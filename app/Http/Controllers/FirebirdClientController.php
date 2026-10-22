@@ -12,69 +12,102 @@ class FirebirdClientController extends Controller
     public function search(
         Request $request,
         FirebirdClientApiService $firebird
-    ): JsonResponse {
-        $term = trim((string) $request->query('q', ''));
+    ) {
+        $term = trim(
+            (string) $request->query('q', '')
+        );
 
-        $page = max(1, (int) $request->query('page', 1));
-        $limit = max(1, min(
-            (int) $request->query('limit', 50),
-            100
-        ));
+        $page = max(
+            1,
+            (int) $request->query('page', 1)
+        );
 
-        if (mb_strlen($term) < 2) {
-            return response()->json([
-                'success' => true,
-                'data' => [],
-                'pagination' => [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'total' => 0,
-                    'totalPages' => 0,
-                    'hasNextPage' => false,
-                ],
-            ]);
-        }
+        $limit = max(
+            1,
+            min(
+                (int) $request->query('limit', 50),
+                100
+            )
+        );
 
-        try {
-            $response = $firebird->search(
-                term: $term,
-                page: $page,
-                limit: $limit
+        $response = $term !== ''
+            ? $firebird->search(
+                $term,
+                $page,
+                $limit
+            )
+            : $firebird->list(
+                $page,
+                $limit
             );
 
-            $clientes = collect($response['data'] ?? [])
-                ->map(function (array $cliente) {
-                    return [
-                        'codigo' => $cliente['codigo'] ?? null,
-                        'nombre' => $cliente['nombreCompleto']
-                            ?? $cliente['nombre']
-                            ?? '',
-                        'rfc' => $cliente['fiscal']['rfc'] ?? '',
-                        'tipoPersona' => $cliente['tipoPersona'] ?? '',
-                    ];
-                })
-                ->filter(fn($cliente) => !empty($cliente['codigo']))
-                ->values();
+        $data = collect(
+            $response['data'] ?? []
+        )
+            ->map(function (array $client) {
 
-            return response()->json([
-                'success' => true,
-                'data' => $clientes,
-                'pagination' => $response['pagination'] ?? [
-                    'page' => $page,
-                    'limit' => $limit,
-                    'total' => count($clientes),
-                    'totalPages' => 1,
-                    'hasNextPage' => false,
-                ],
-            ]);
+                $codigo = trim(
+                    (string) (
+                        $client['codigo']
+                        ?? ''
+                    )
+                );
 
-        } catch (Throwable $e) {
-            report($e);
+                $source = trim(
+                    (string) (
+                        $client['source']
+                        ?? 'main'
+                    )
+                );
 
-            return response()->json([
-                'success' => false,
-                'message' => 'No fue posible consultar los clientes.',
-            ], 500);
-        }
+                $sourceLabel =
+                    $client['sourceLabel']
+                    ?? (
+                        $source === 'oric'
+                        ? 'MMW32_ORIC'
+                        : 'MMW32'
+                    );
+
+                return [
+                    'codigo' =>
+                        $codigo,
+
+                    'nombre' =>
+                        $client['nombreCompleto']
+                        ?? $client['nombre']
+                        ?? '',
+
+                    'rfc' =>
+                        $client['fiscal']['rfc']
+                        ?? '',
+
+                    'tipoPersona' =>
+                        $client['tipoPersona']
+                        ?? null,
+
+                    'source' =>
+                        $source,
+
+                    'sourceLabel' =>
+                        $sourceLabel,
+
+                    'key' =>
+                        $source
+                        . '|'
+                        . $codigo,
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'success' => true,
+
+            'data' =>
+                $data,
+
+            'pagination' =>
+                $response['pagination']
+                ?? [],
+        ]);
     }
 }

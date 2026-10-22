@@ -61,25 +61,36 @@ class FirebirdClientApiService
         return $response->json();
     }
 
-    public function find(string $codigo): array
+    public function find(string $codigo, string $source = 'main'): array
     {
         $response = $this->client()->get(
-            "{$this->baseUrl}/api/v1/clientes/{$codigo}"
+            config('services.firebird_api.url')
+            . '/api/v1/clientes/'
+            . urlencode($codigo),
+            [
+                'source' => $source,
+            ]
         );
 
-        if ($response->status() === 404) {
-            throw new RuntimeException(
-                'Cliente no encontrado.'
-            );
-        }
-
         if ($response->failed()) {
-            throw new RuntimeException(
-                'No fue posible consultar el cliente.'
+            throw new \RuntimeException(
+                'No se pudo consultar el cliente en Firebird.'
             );
         }
 
-        return $response->json();
+        $json = $response->json();
+
+        if (
+            !is_array($json)
+            || !($json['success'] ?? false)
+            || !isset($json['data'])
+        ) {
+            throw new \RuntimeException(
+                'Respuesta inválida al consultar el cliente.'
+            );
+        }
+
+        return $json['data'];
     }
 
     public function health(): array

@@ -1,17 +1,9 @@
-import TomSelect from "tom-select";
-import "tom-select/dist/css/tom-select.css";
+import Alpine from 'alpinejs';
 
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.css';
+
+window.Alpine = Alpine;
 window.TomSelect = TomSelect;
 
-document.addEventListener("DOMContentLoaded", () => {
-    const clientSelect = document.querySelector("#client");
-
-    if (clientSelect) {
-        new TomSelect(clientSelect, {
-            create: false,
-            allowEmptyOption: true,
-            placeholder: "Buscar cliente...",
-            searchField: ["text"],
-        });
-    }
-});
+Alpine.start();
