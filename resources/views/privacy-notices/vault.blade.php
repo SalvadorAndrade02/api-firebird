@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- ====================================================== --}}
         {{-- ENCABEZADO --}}
@@ -31,7 +31,7 @@
 
 
             <a href="{{ route('privacy-notices.create') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 sm:w-auto text-sm font-semibold text-white transition hover:bg-gray-800">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -159,7 +159,7 @@
         {{-- FILTROS --}}
         {{-- ====================================================== --}}
 
-        <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section class="mb-8 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
             <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
@@ -369,7 +369,7 @@
 
             <div class="overflow-x-auto">
 
-                <table class="w-full">
+                <table class="w-full min-w-[1120px]">
 
                     <thead class="bg-[#f8f8f8]">
 
@@ -465,11 +465,7 @@
                                                 {{-- AVISO --}}
                                                 <td class="px-5 py-4">
 
-                                                    <p class="font-semibold text-gray-900">
-                                                        #{{ $notice->id }}
-                                                    </p>
-
-                                                    <p class="mt-1 font-mono text-xs text-gray-400">
+                                                    <p class="mt-1 font-mono text-xs text-black">
                                                         {{ $clientCode }}
                                                     </p>
 

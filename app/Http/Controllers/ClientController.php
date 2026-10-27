@@ -218,43 +218,55 @@ class ClientController extends Controller
         }
 
 
-        $clients = Client::query()
+        $server =
+            session('firebird_server');
 
-            ->where(
-                function ($query) use ($term) {
+        $clients =
+            Client::query()
 
-                    $query
-                        ->where(
-                            'codigo',
-                            'like',
-                            "%{$term}%"
-                        )
+                ->where(
+                    'server',
+                    $server
+                )
 
-                        ->orWhere(
-                            'nombre_completo',
-                            'like',
-                            "%{$term}%"
-                        )
+                ->where(
+                    function ($query) use ($term) {
 
-                        ->orWhere(
-                            'rfc',
-                            'like',
-                            "%{$term}%"
-                        );
-                }
-            )
+                        $query
+                            ->where(
+                                'codigo',
+                                'like',
+                                "%{$term}%"
+                            )
 
-            ->orderBy('nombre_completo')
+                            ->orWhere(
+                                'nombre_completo',
+                                'like',
+                                "%{$term}%"
+                            )
 
-            ->limit(10)
+                            ->orWhere(
+                                'rfc',
+                                'like',
+                                "%{$term}%"
+                            );
+                    }
+                )
 
-            ->get([
-                'id',
-                'codigo',
-                'source',
-                'nombre_completo',
-                'rfc',
-            ]);
+                ->orderBy(
+                    'nombre_completo'
+                )
+
+                ->limit(10)
+
+                ->get([
+                    'id',
+                    'server',
+                    'codigo',
+                    'source',
+                    'nombre_completo',
+                    'rfc',
+                ]);
 
 
         return response()->json(

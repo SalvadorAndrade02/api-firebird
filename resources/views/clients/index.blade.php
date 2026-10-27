@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- ====================================================== --}}
         {{-- ENCABEZADO --}}
@@ -31,7 +31,7 @@
 
 
             <a href="{{ route('privacy-notices.create') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-black px-5 py-3 sm:w-auto text-sm font-semibold text-white transition hover:bg-gray-800">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -137,7 +137,7 @@
 
             <div class="overflow-x-auto">
 
-                <table class="w-full">
+                <table class="w-full min-w-[960px]">
 
                     <thead class="bg-[#f8f8f8]">
 

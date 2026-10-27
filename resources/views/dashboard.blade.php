@@ -4,14 +4,14 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- ====================================================== --}}
         {{-- HERO / BIENVENIDA --}}
         {{-- ====================================================== --}}
 
         <section
-            class="relative overflow-hidden rounded-[28px] bg-[#111111] px-8 py-9 lg:px-10 lg:py-10 text-white shadow-sm">
+            class="relative overflow-hidden rounded-2xl sm:rounded-[28px] bg-[#111111] px-5 py-7 sm:px-8 sm:py-9 lg:px-10 lg:py-10 text-white shadow-sm">
 
             {{-- DECORACIÓN --}}
             <div class="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-white/10"></div>
@@ -41,10 +41,10 @@
                 </div>
 
 
-                <div class="flex flex-wrap gap-3">
+                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 
                     <a href="{{ route('privacy-notices.create') }}"
-                        class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100">
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 sm:w-auto text-sm font-semibold text-black transition hover:bg-gray-100">
 
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -57,7 +57,7 @@
 
 
                     <a href="{{ route('privacy-notices.vault') }}"
-                        class="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 sm:w-auto text-sm font-semibold text-white transition hover:bg-white/10">
 
                         Ver bóveda
 
@@ -385,7 +385,7 @@
 
 
                         <a href="{{ route('privacy-notices.show', $notice) }}"
-                            class="flex items-center justify-between gap-5 border-b border-gray-100 px-6 py-4 transition last:border-b-0 hover:bg-gray-50">
+                            class="flex flex-col gap-3 border-b border-gray-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:px-6 transition last:border-b-0 hover:bg-gray-50">
 
                             <div class="min-w-0">
 
@@ -428,7 +428,7 @@
                             </div>
 
 
-                            <div class="shrink-0 text-right">
+                            <div class="shrink-0 text-left sm:text-right">
 
                                 <p class="text-xs text-gray-400">
                                     {{ $notice->created_at?->format('d/m/Y') }}
@@ -470,7 +470,7 @@
         <section class="mt-10 grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
 
             {{-- FLUJO --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-7">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-7">
 
                 <div class="flex items-start justify-between gap-6">
 
@@ -576,7 +576,7 @@
 
 
             {{-- SESIÓN --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-7">
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-7">
 
                 <p class="text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
                     Sesión

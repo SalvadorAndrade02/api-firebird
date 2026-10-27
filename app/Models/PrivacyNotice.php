@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PrivacyNotice extends Model
 {
     protected $fillable = [
+        'server',
         'client_id',
         'submission_token',
         'company_id',

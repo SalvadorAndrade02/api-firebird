@@ -7,47 +7,109 @@ use RuntimeException;
 
 class FirebirdCompanyApiService
 {
-    private function client()
+    public function __construct(
+        private FirebirdApiConnectionResolver $resolver
+    ) {
+    }
+
+
+    private function connection(): array
     {
+        return $this->resolver->resolve();
+    }
+
+
+    private function client(
+        array $connection
+    ) {
         return Http::withHeaders([
-            'X-API-KEY' => config('services.firebird_api.key'),
+            'X-API-KEY' =>
+                $connection['key'],
         ])
             ->acceptJson()
             ->timeout(15)
             ->connectTimeout(5);
     }
 
+
     public function list(): array
     {
-        $response = $this->client()->get(
-            config('services.firebird_api.url') . '/api/v1/empresas'
-        );
+        $connection =
+            $this->connection();
+
+
+        $response =
+            $this->client($connection)
+                ->get(
+                    $connection['url']
+                    . '/api/v1/empresas'
+                );
+
 
         if ($response->failed()) {
+
             throw new RuntimeException(
-                'No fue posible consultar las empresas en Firebird.'
+                'No fue posible consultar las empresas en '
+                . $connection['label']
+                . '.'
             );
         }
 
-        return $response->json();
+
+        $json =
+            $response->json();
+
+
+        if (!is_array($json)) {
+
+            throw new RuntimeException(
+                'La API de empresas devolvió una respuesta inválida.'
+            );
+        }
+
+
+        return $json;
     }
 
-    public function find(int $id): array
-    {
-        $response = $this->client()->get(
-            config('services.firebird_api.url') . '/api/v1/empresas/' . $id
-        );
+
+    public function find(
+        int $id
+    ): array {
+
+        $connection =
+            $this->connection();
+
+
+        $response =
+            $this->client($connection)
+                ->get(
+                    $connection['url']
+                    . '/api/v1/empresas/'
+                    . $id
+                );
+
 
         if ($response->status() === 404) {
             return [];
         }
 
+
         if ($response->failed()) {
+
             throw new RuntimeException(
-                'No fue posible consultar la empresa en Firebird.'
+                'No fue posible consultar la empresa en '
+                . $connection['label']
+                . '.'
             );
         }
 
-        return $response->json();
+
+        $json =
+            $response->json();
+
+
+        return is_array($json)
+            ? $json
+            : [];
     }
 }

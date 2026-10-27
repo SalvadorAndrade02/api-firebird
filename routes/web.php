@@ -6,44 +6,102 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PrivacyNoticeController;
 use App\Http\Controllers\FirebirdClientController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FirebirdServerController;
+use App\Http\Middleware\EnsureFirebirdServerSelected;
+
 
 /*
 |--------------------------------------------------------------------------
-| RUTA RAÍZ
+| SELECCIÓN DE SERVIDOR
 |--------------------------------------------------------------------------
-|
-| Si el usuario no ha iniciado sesión, auth lo mandará a /login.
-| Si ya inició sesión, verá el dashboard del sistema.
-|
 */
 
 Route::middleware('auth')->group(function () {
 
+    Route::get(
+        '/seleccionar-servidor',
+        [
+            FirebirdServerController::class,
+            'create',
+        ]
+    )->name('server.select');
+
+
+    Route::post(
+        '/seleccionar-servidor',
+        [
+            FirebirdServerController::class,
+            'store',
+        ]
+    )->name('server.store');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| APLICACIÓN
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'auth',
+    EnsureFirebirdServerSelected::class,
+])->group(function () {
+
     Route::get('/', function () {
 
+        $server =
+            session('firebird_server');
+
         $totalNotices =
-            \App\Models\PrivacyNotice::count();
+            \App\Models\PrivacyNotice::where(
+                'server',
+                $server
+            )->count();
 
         $signedNotices =
             \App\Models\PrivacyNotice::where(
-                'status',
-                'SIGNED'
-            )->count();
+                'server',
+                $server
+            )
+                ->where(
+                    'status',
+                    'SIGNED'
+                )
+                ->count();
+
 
         $pendingNotices =
             \App\Models\PrivacyNotice::where(
-                'status',
-                'PENDING_MANUAL_SIGNATURE'
-            )->count();
+                'server',
+                $server
+            )
+                ->where(
+                    'status',
+                    'PENDING_MANUAL_SIGNATURE'
+                )
+                ->count();
+
 
         $digitalNotices =
             \App\Models\PrivacyNotice::where(
-                'signature_type',
-                'DIGITAL'
-            )->count();
+                'server',
+                $server
+            )
+                ->where(
+                    'signature_type',
+                    'DIGITAL'
+                )
+                ->count();
+
 
         $recentNotices =
             \App\Models\PrivacyNotice::query()
+                ->where(
+                    'server',
+                    $server
+                )
                 ->with('client')
                 ->latest()
                 ->limit(5)
@@ -128,14 +186,28 @@ Route::middleware('auth')->group(function () {
         [PrivacyNoticeController::class, 'uploadSigned']
     )->name('privacy-notices.upload-signed');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])
-        ->name('profile.edit');
 
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
+    /*
+    |--------------------------------------------------------------------------
+    | PERFIL
+    |--------------------------------------------------------------------------
+    */
 
-    Route::delete('/profile', [ProfileController::class, 'destroy'])
-        ->name('profile.destroy');
+    Route::get(
+        '/profile',
+        [ProfileController::class, 'edit']
+    )->name('profile.edit');
+
+    Route::patch(
+        '/profile',
+        [ProfileController::class, 'update']
+    )->name('profile.update');
+
+    Route::delete(
+        '/profile',
+        [ProfileController::class, 'destroy']
+    )->name('profile.destroy');
+
 
     /*
     |--------------------------------------------------------------------------
@@ -149,6 +221,7 @@ Route::middleware('auth')->group(function () {
     )->name('privacy-notices.vault');
 
 });
+
 
 /*
 |--------------------------------------------------------------------------

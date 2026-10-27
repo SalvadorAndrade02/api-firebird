@@ -15,6 +15,38 @@ use Illuminate\Support\Str;
 
 class PrivacyNoticeController extends Controller
 {
+
+    private function currentServer(): string
+    {
+        $server = session('firebird_server');
+
+        if (!in_array($server, ['polaris', 'canam'], true)) {
+            abort(409, 'No hay una marca activa seleccionada.');
+        }
+
+        return $server;
+    }
+
+    private function currentServerLabel(): string
+    {
+        return session(
+            'firebird_server_label',
+            $this->currentServer() === 'canam'
+            ? 'Can-Am'
+            : 'Polaris'
+        );
+    }
+
+    private function ensureNoticeBelongsToCurrentServer(
+        PrivacyNotice $privacyNotice
+    ): void {
+        if (
+            $privacyNotice->server !==
+            $this->currentServer()
+        ) {
+            abort(404);
+        }
+    }
     public function create(
         Request $request,
         FirebirdClientApiService $firebirdClients,
@@ -102,6 +134,8 @@ class PrivacyNoticeController extends Controller
                 $source
             );
 
+            $server = $this->currentServer();
+
             /*
             |--------------------------------------------------------------------------
             | CACHE LOCAL DEL CLIENTE
@@ -110,6 +144,7 @@ class PrivacyNoticeController extends Controller
 
             $client = Client::updateOrCreate(
                 [
+                    'server' => $server,
                     'source' => $source,
                     'codigo' => $codigo,
                 ],
@@ -183,7 +218,8 @@ class PrivacyNoticeController extends Controller
                         $remote['contacto']['email']
                         ?? null,
 
-                    'synced_at' => now(),
+                    'synced_at' =>
+                        now(),
                 ]
             );
         }
@@ -206,6 +242,8 @@ class PrivacyNoticeController extends Controller
         Request $request,
         FirebirdCompanyApiService $firebirdCompanies
     ) {
+        $server = $this->currentServer();
+        $serverLabel = $this->currentServerLabel();
         /*
         |--------------------------------------------------------------------------
         | VALIDACIÓN BÁSICA
@@ -248,9 +286,14 @@ class PrivacyNoticeController extends Controller
 
         $existingNotice =
             PrivacyNotice::where(
-                'submission_token',
-                $validated['submission_token']
-            )->first();
+                'server',
+                $server
+            )
+                ->where(
+                    'submission_token',
+                    $validated['submission_token']
+                )
+                ->first();
 
         if ($existingNotice) {
 
@@ -276,6 +319,13 @@ class PrivacyNoticeController extends Controller
         $client = Client::findOrFail(
             $validated['client_id']
         );
+
+        if ($client->server !== $server) {
+            abort(
+                422,
+                'El cliente seleccionado no pertenece a la marca activa.'
+            );
+        }
 
 
         /*
@@ -425,6 +475,12 @@ class PrivacyNoticeController extends Controller
         */
 
         $snapshot = [
+
+            'server' =>
+                $server,
+
+            'server_label' =>
+                $serverLabel,
 
             'source' =>
                 $client->source
@@ -688,6 +744,9 @@ class PrivacyNoticeController extends Controller
 
             $notice = PrivacyNotice::create([
 
+                'server' =>
+                    $server,
+
                 'submission_token' =>
                     $validated['submission_token'],
 
@@ -760,6 +819,8 @@ class PrivacyNoticeController extends Controller
 
             $path =
                 'privacy-notices/'
+                . $server
+                . '/'
                 . ($client->source ?? 'main')
                 . '/'
                 . $client->codigo
@@ -894,8 +955,13 @@ class PrivacyNoticeController extends Controller
             );
     }
 
-    public function show(PrivacyNotice $privacyNotice)
-    {
+    public function show(
+        PrivacyNotice $privacyNotice
+    ) {
+        $this->ensureNoticeBelongsToCurrentServer(
+            $privacyNotice
+        );
+
         $privacyNotice->load('client');
 
         $clientSnapshot =
@@ -915,6 +981,9 @@ class PrivacyNoticeController extends Controller
         Request $request,
         PrivacyNotice $privacyNotice
     ) {
+        $this->ensureNoticeBelongsToCurrentServer(
+            $privacyNotice
+        );
         if (!$privacyNotice->pdf_path) {
             abort(404, 'El PDF no está disponible.');
         }
@@ -952,6 +1021,11 @@ class PrivacyNoticeController extends Controller
         Request $request,
         PrivacyNotice $privacyNotice
     ) {
+        $this->ensureNoticeBelongsToCurrentServer(
+            $privacyNotice
+        );
+
+        $server = $this->currentServer();
         $request->validate([
             'signed_pdf' => [
                 'required',
@@ -976,6 +1050,8 @@ class PrivacyNoticeController extends Controller
             ->file('signed_pdf')
             ->store(
                 'privacy-notices/'
+                . $server
+                . '/'
                 . $clientSource
                 . '/'
                 . $clientCode
@@ -998,6 +1074,9 @@ class PrivacyNoticeController extends Controller
     public function destroy(
         PrivacyNotice $privacyNotice
     ) {
+        $this->ensureNoticeBelongsToCurrentServer(
+            $privacyNotice
+        );
         $paths = array_filter([
             $privacyNotice->pdf_path,
             $privacyNotice->signed_pdf_path,
@@ -1080,53 +1159,61 @@ class PrivacyNoticeController extends Controller
         $signatureType = $request->get('signature_type');
         $companyId = $request->get('company_id');
 
-        $notices = PrivacyNotice::query()
-            ->with('client')
+        $server =
+            $this->currentServer();
 
-            ->when($search !== '', function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
+        $notices =
+            PrivacyNotice::query()
+                ->where(
+                    'server',
+                    $server
+                )
+                ->with('client')
 
-                    $q->whereHas('client', function ($clientQuery) use ($search) {
-                        $clientQuery->where(function ($client) use ($search) {
-                            $client
-                                ->where('codigo', 'like', "%{$search}%")
-                                ->orWhere('nombre_completo', 'like', "%{$search}%")
-                                ->orWhere('rfc', 'like', "%{$search}%");
-                        });
-                    })
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
 
-                        ->orWhere(
-                            'client_snapshot',
-                            'like',
-                            "%{$search}%"
-                        );
-                });
-            })
+                        $q->whereHas('client', function ($clientQuery) use ($search) {
+                            $clientQuery->where(function ($client) use ($search) {
+                                $client
+                                    ->where('codigo', 'like', "%{$search}%")
+                                    ->orWhere('nombre_completo', 'like', "%{$search}%")
+                                    ->orWhere('rfc', 'like', "%{$search}%");
+                            });
+                        })
 
-            ->when($companyId, function ($query) use ($companyId) {
-                $query->where(
-                    'company_id',
-                    $companyId
-                );
-            })
+                            ->orWhere(
+                                'client_snapshot',
+                                'like',
+                                "%{$search}%"
+                            );
+                    });
+                })
 
-            ->when($status, function ($query) use ($status) {
-                $query->where(
-                    'status',
-                    $status
-                );
-            })
+                ->when($companyId, function ($query) use ($companyId) {
+                    $query->where(
+                        'company_id',
+                        $companyId
+                    );
+                })
 
-            ->when($signatureType, function ($query) use ($signatureType) {
-                $query->where(
-                    'signature_type',
-                    $signatureType
-                );
-            })
+                ->when($status, function ($query) use ($status) {
+                    $query->where(
+                        'status',
+                        $status
+                    );
+                })
 
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+                ->when($signatureType, function ($query) use ($signatureType) {
+                    $query->where(
+                        'signature_type',
+                        $signatureType
+                    );
+                })
+
+                ->latest()
+                ->paginate(15)
+                ->withQueryString();
 
 
         try {

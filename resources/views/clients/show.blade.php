@@ -16,7 +16,7 @@
             );
     @endphp
 
-    <div class="max-w-6xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-6xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- ====================================================== --}}
         {{-- REGRESAR --}}
@@ -45,7 +45,7 @@
 
         <div class="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm">
 
-            <div class="border-b border-gray-100 bg-[#111111] px-8 py-8 text-white">
+            <div class="border-b border-gray-100 bg-[#111111] px-5 py-6 text-white sm:px-8 sm:py-8">
 
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
 
@@ -112,7 +112,7 @@
             . '|'
             . $client['codigo'],
     ]) }}"
-                        class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100">
+                        class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 sm:w-auto text-sm font-semibold text-black transition hover:bg-gray-100">
 
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -132,7 +132,7 @@
             {{-- CONTENIDO --}}
             {{-- ====================================================== --}}
 
-            <div class="p-8">
+            <div class="p-5 sm:p-8">
 
                 {{-- DATOS FISCALES --}}
                 <section>
@@ -317,7 +317,7 @@
                     </div>
 
 
-                    <div class="rounded-2xl border border-gray-200 bg-gray-50/60 p-6">
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50/60 p-4 sm:p-6">
 
                         <div class="flex items-start gap-4">
 

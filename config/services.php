@@ -40,8 +40,23 @@ return [
     ],
 
     'firebird_api' => [
-        'url' => env('FIREBIRD_API_URL'),
-        'key' => env('FIREBIRD_API_KEY'),
+
+        'servers' => [
+
+            'polaris' => [
+                'label' => 'Polaris',
+                'url' => env('FIREBIRD_POLARIS_URL'),
+                'key' => env('FIREBIRD_POLARIS_KEY'),
+            ],
+
+            'canam' => [
+                'label' => 'Can-Am',
+                'url' => env('FIREBIRD_CANAM_URL'),
+                'key' => env('FIREBIRD_CANAM_KEY'),
+            ],
+
+        ],
+
     ],
 
 ];

@@ -43,7 +43,7 @@
 
 @section('content')
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- REGRESAR --}}
         <div class="mb-6">
@@ -67,7 +67,7 @@
         {{-- HERO --}}
         {{-- ====================================================== --}}
 
-        <section class="relative overflow-hidden rounded-[28px] bg-[#111111] px-8 py-8 text-white shadow-sm lg:px-10">
+        <section class="relative overflow-hidden rounded-2xl bg-[#111111] px-5 py-6 text-white shadow-sm sm:rounded-[28px] sm:px-8 sm:py-8 lg:px-10">
 
             <div class="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border border-white/10"></div>
 
@@ -276,7 +276,7 @@
         <div class="mt-8 grid gap-6 lg:grid-cols-2">
 
             {{-- EMPRESA --}}
-            <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
                 <div class="flex items-start gap-4">
 
@@ -350,7 +350,7 @@
 
 
             {{-- CLIENTE --}}
-            <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
                 <div class="flex items-start gap-4">
 

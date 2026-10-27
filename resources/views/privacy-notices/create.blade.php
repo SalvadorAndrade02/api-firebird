@@ -13,7 +13,7 @@
             : 'MMW32';
     @endphp
 
-    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {{-- ====================================================== --}}
         {{-- ENCABEZADO --}}
@@ -39,7 +39,7 @@
             </div>
 
             <a href="{{ route('privacy-notices.vault') }}"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-black">
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-3 sm:w-auto text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-black">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -201,7 +201,7 @@
                 {{-- EMPRESA --}}
                 {{-- ====================================================== --}}
 
-                <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
                     <div class="mb-5 flex items-start gap-4">
 
@@ -293,7 +293,7 @@
                 {{-- CLIENTE --}}
                 {{-- ====================================================== --}}
 
-                <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
                     <div class="mb-5 flex items-start gap-4">
 
@@ -491,7 +491,7 @@
 
 
                 {{-- TIPO DE FIRMA --}}
-                <section class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <section class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
 
                     <div class="mb-6">
 
@@ -622,14 +622,14 @@
 
                     <div class="mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
 
-                        <canvas id="signature-pad" width="1000" height="300" class="block w-full bg-white"
-                            style="touch-action: none; height: 220px; cursor: crosshair;">
+                        <canvas id="signature-pad" width="1000" height="300" class="block h-[180px] w-full bg-white sm:h-[220px]"
+                            style="touch-action: none; cursor: crosshair;">
                         </canvas>
 
                     </div>
 
 
-                    <div class="mt-4 flex flex-wrap gap-3">
+                    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 
                         <button type="button" id="clear-signature"
                             class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
