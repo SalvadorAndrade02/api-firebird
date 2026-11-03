@@ -64,8 +64,13 @@ class FirebirdServerController extends Controller
 
             $response =
                 Http::acceptJson()
-                    ->timeout(8)
                     ->connectTimeout(5)
+                    ->timeout(8)
+                    ->retry(
+                        3,
+                        500,
+                        throw: false
+                    )
                     ->get(
                         rtrim(
                             $config['url'],

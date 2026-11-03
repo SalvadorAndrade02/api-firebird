@@ -96,14 +96,14 @@
         <div class="mb-7 grid gap-3 sm:grid-cols-3">
 
             <div class="rounded-2xl border
-                                                            {{ $company ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
-                                                            px-5 py-4">
+                                                                {{ $company ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
+                                                                px-5 py-4">
 
                 <div class="flex items-center gap-3">
 
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg
-                                                                    {{ $company ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
-                                                                    text-xs font-semibold">
+                                                                        {{ $company ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
+                                                                        text-xs font-semibold">
                         01
                     </div>
 
@@ -115,7 +115,7 @@
 
                         <p
                             class="mt-0.5 text-xs
-                                                                        {{ $company ? 'text-white/50' : 'text-gray-400' }}">
+                                                                            {{ $company ? 'text-white/50' : 'text-gray-400' }}">
                             Responsable del aviso
                         </p>
 
@@ -127,14 +127,14 @@
 
 
             <div class="rounded-2xl border
-                                                            {{ $client ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
-                                                            px-5 py-4">
+                                                                {{ $client ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
+                                                                px-5 py-4">
 
                 <div class="flex items-center gap-3">
 
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg
-                                                                    {{ $client ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
-                                                                    text-xs font-semibold">
+                                                                        {{ $client ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
+                                                                        text-xs font-semibold">
                         02
                     </div>
 
@@ -144,8 +144,9 @@
                             Cliente
                         </p>
 
-                        <p class="mt-0.5 text-xs
-                                                                        {{ $client ? 'text-white/50' : 'text-gray-400' }}">
+                        <p
+                            class="mt-0.5 text-xs
+                                                                            {{ $client ? 'text-white/50' : 'text-gray-400' }}">
                             Titular de los datos
                         </p>
 
@@ -157,14 +158,14 @@
 
 
             <div class="rounded-2xl border
-                                                            {{ ($client && $company) ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
-                                                            px-5 py-4">
+                                                                {{ ($client && $company) ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-700' }}
+                                                                px-5 py-4">
 
                 <div class="flex items-center gap-3">
 
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg
-                                                                    {{ ($client && $company) ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
-                                                                    text-xs font-semibold">
+                                                                        {{ ($client && $company) ? 'bg-white text-black' : 'bg-gray-100 text-gray-600' }}
+                                                                        text-xs font-semibold">
                         03
                     </div>
 
@@ -176,7 +177,7 @@
 
                         <p
                             class="mt-0.5 text-xs
-                                                                        {{ ($client && $company) ? 'text-white/50' : 'text-gray-400' }}">
+                                                                            {{ ($client && $company) ? 'text-white/50' : 'text-gray-400' }}">
                             Confirmación del documento
                         </p>
 
@@ -622,8 +623,8 @@
 
                     <div class="mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
 
-                        <canvas id="signature-pad" width="1000" height="300" class="block h-[180px] w-full bg-white sm:h-[220px]"
-                            style="touch-action: none; cursor: crosshair;">
+                        <canvas id="signature-pad" width="1000" height="300"
+                            class="block h-[180px] w-full bg-white sm:h-[220px]" style="touch-action: none; cursor: crosshair;">
                         </canvas>
 
                     </div>
@@ -1288,7 +1289,9 @@
                     const endpoint =
                         @json(
                             route(
-                                'clientes.firebird.search'
+                                'clientes.firebird.search',
+                                [],
+                                false
                             )
                         );
 
@@ -1551,42 +1554,42 @@
                                         ) {
 
                                             return `
-                                                            <div class="py-2">
+                                                                    <div class="py-2">
 
-                                                                <div
-                                                                    class="font-medium text-gray-900"
-                                                                >
-                                                                    ${escape(
+                                                                        <div
+                                                                            class="font-medium text-gray-900"
+                                                                        >
+                                                                            ${escape(
                                                 item.nombre
                                                 || ''
                                             )}
-                                                                </div>
+                                                                        </div>
 
-                                                                <div
-                                                                    class="mt-1 text-xs text-gray-500"
-                                                                >
-                                                                    ${escape(
+                                                                        <div
+                                                                            class="mt-1 text-xs text-gray-500"
+                                                                        >
+                                                                            ${escape(
                                                 item.codigo
                                                 || ''
                                             )}
 
-                                                                    ·
+                                                                            ·
 
-                                                                    ${escape(
+                                                                            ${escape(
                                                 item.rfc
                                                 || 'Sin RFC'
                                             )}
 
-                                                                    ·
+                                                                            ·
 
-                                                                    ${escape(
+                                                                            ${escape(
                                                 item.sourceLabel
                                                 || ''
                                             )}
-                                                                </div>
+                                                                        </div>
 
-                                                            </div>
-                                                        `;
+                                                                    </div>
+                                                                `;
                                         },
 
 
@@ -1597,25 +1600,25 @@
                                         ) {
 
                                             return `
-                                                            <div>
+                                                                    <div>
 
-                                                                ${escape(
+                                                                        ${escape(
                                                 item.nombre
                                                 || ''
                                             )}
 
-                                                                <span
-                                                                    class="text-xs text-gray-500"
-                                                                >
-                                                                    ·
-                                                                    ${escape(
+                                                                        <span
+                                                                            class="text-xs text-gray-500"
+                                                                        >
+                                                                            ·
+                                                                            ${escape(
                                                 item.sourceLabel
                                                 || ''
                                             )}
-                                                                </span>
+                                                                        </span>
 
-                                                            </div>
-                                                        `;
+                                                                    </div>
+                                                                `;
                                         }
                                 }
                             }
